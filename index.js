@@ -20,12 +20,25 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
       await client.connect();
       const serviceCollection = client.db('khan_tools').collection('services');
       const bookingCollection = client.db('khan_tools').collection('booking');
+      const userCollection = client.db('khan_tools').collection('users');
 
       app.get('/service', async(req, res) =>{
         const query = {};
         const cursor = serviceCollection.find(query);
         const services = await cursor.toArray();
         res.send(services);
+      });
+
+      app.put('/user/:email', async (req, res) => {
+        const email = req.params.email;
+        const user = req.body;
+        const filter = { email: email };
+        const options = { upsert: true };
+        const updateDoc = {
+          $set: user,
+        };
+        const result = await userCollection.updateOne(filter, updateDoc, options);
+        res.send(result);
       });
 
       app.get('/booking', async(req, res)=>{

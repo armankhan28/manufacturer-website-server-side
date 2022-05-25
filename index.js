@@ -18,12 +18,19 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
     try{
       await client.connect();
       const serviceCollection = client.db('khan_tools').collection('services');
+      const bookingCollection = client.db('khan_tools').collection('booking');
 
       app.get('/service', async(req, res) =>{
         const query = {};
         const cursor = serviceCollection.find(query);
         const services = await cursor.toArray();
         res.send(services);
+      });
+
+      app.post('/booking', async(req, res)=>{
+        const booking = req.body;
+        const result = await bookingCollection.insertOne(booking);
+        res.send(result);
       })
     }
     finally{
